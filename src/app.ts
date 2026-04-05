@@ -2,6 +2,7 @@ import cors, { CorsOptions } from 'cors';
 import express, { Application, Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import mongoose from 'mongoose';
 
 // Route imports
 import { AuthRoutes } from './app/modules/auth/auth.routes';
@@ -10,6 +11,25 @@ import { CommentRoutes } from './app/modules/comment/comment.routes';
 import { UploadRoutes } from './app/modules/upload/upload.routes';
 
 const app: Application = express();
+
+// ✅ Database connection middleware (ensures DB is connected before handling requests)
+let dbConnected = false;
+app.use(async (req: Request, res: Response, next: NextFunction) => {
+  if (!dbConnected && mongoose.connection.readyState !== 1) {
+    const dbUrl = process.env.DATABASE_URL;
+    if (dbUrl) {
+      try {
+        await mongoose.connect(dbUrl);
+        dbConnected = true;
+        console.log('✅ Database connected via middleware');
+      } catch (error: any) {
+        console.error('❌ DB connection failed:', error.message);
+        return res.status(500).json({ success: false, message: 'Database connection failed' });
+      }
+    }
+  }
+  next();
+});
 
 // ✅ Security: Helmet (HTTP headers)
 app.use(helmet());
