@@ -1,125 +1,173 @@
-# SocialVillage — Backend API
+# SocialVillage — Backend API (Node.js + Express)
 
-A RESTful API server for the SocialVillage social media application, built with Express.js, MongoDB, and TypeScript.
+A RESTful API server for the SocialVillage social media application, built with **Express.js**, **TypeScript**, and **MongoDB**.
 
-## 🛠 Tech Stack
+## 🌐 Live API
+**https://social-server-kappa-six.vercel.app/api**
 
-| Technology | Purpose |
-|-----------|---------|
-| **Express.js v5** | Web framework |
-| **TypeScript** | Type safety |
-| **MongoDB + Mongoose** | Database & ODM |
-| **JWT** | Authentication |
-| **bcryptjs** | Password hashing |
-| **Cloudinary** | Image storage |
-| **Zod v4** | Input validation |
-| **Helmet** | HTTP security headers |
-| **CORS** | Cross-origin configuration |
-| **express-rate-limit** | Rate limiting |
+## 📂 Repositories
+- **Frontend:** https://github.com/sakkib443/social_client
+- **Backend:** https://github.com/sakkib443/social_server
 
-## 📁 Project Structure
+---
 
-```
-src/
-├── app/
-│   ├── config/          # Environment config
-│   ├── middlewares/      # Auth middleware
-│   └── modules/
-│       ├── auth/        # Register, Login, Google OAuth
-│       ├── post/        # CRUD posts, likes
-│       ├── comment/     # Comments, replies, likes
-│       ├── upload/      # Image upload (Cloudinary)
-│       └── user/        # User model & validation
-├── app.ts               # Express app configuration
-├── server.ts            # Server entry (local dev)
-└── index.ts             # Vercel serverless entry
-```
+## ✅ API Endpoints
 
-## 🔐 API Endpoints
-
-### Auth
+### Authentication
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/auth/register` | Register with firstName, lastName, email, password |
-| POST | `/api/auth/login` | Login with email & password |
-| POST | `/api/auth/google` | Google OAuth login |
-| GET | `/api/auth/me` | Get current user (protected) |
+| POST | `/auth/register` | Register new user |
+| POST | `/auth/login` | Login user |
+| GET | `/auth/me` | Get current user |
 
 ### Posts
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/posts` | Get all posts (paginated, newest first) |
-| GET | `/api/posts/:id` | Get single post |
-| POST | `/api/posts` | Create post (text/image, public/private) |
-| DELETE | `/api/posts/:id` | Delete own post |
-| POST | `/api/posts/:id/like` | Toggle like on post |
-| GET | `/api/posts/:id/likers` | Get users who liked a post |
+| GET | `/posts` | Get all public posts (paginated) |
+| POST | `/posts` | Create a new post |
+| DELETE | `/posts/:id` | Delete a post |
+| POST | `/posts/:id/like` | Toggle like on a post |
+| GET | `/posts/:id/likers` | Get users who liked a post |
 
-### Comments & Replies
+### Comments
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/posts/:postId/comments` | Get comments for a post |
-| POST | `/api/posts/:postId/comments` | Create comment |
-| DELETE | `/api/posts/:postId/comments/:commentId` | Delete own comment |
-| POST | `/api/posts/:postId/comments/:commentId/like` | Toggle like on comment |
-| GET | `/api/posts/:postId/comments/:commentId/likers` | Get who liked a comment |
-| GET | `/api/posts/:postId/comments/:commentId/replies` | Get replies |
-| POST | `/api/posts/:postId/comments/:commentId/replies` | Create reply |
+| GET | `/comments/:postId` | Get comments for a post |
+| POST | `/comments` | Create a comment or reply |
+| DELETE | `/comments/:id` | Delete a comment |
+| POST | `/comments/:id/like` | Toggle like on a comment |
+| GET | `/comments/:id/likers` | Get users who liked a comment |
+
+### Friends
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/friends` | Get my friends list |
+| GET | `/friends/requests` | Get pending friend requests |
+| GET | `/friends/sent` | Get my sent requests |
+| GET | `/friends/suggestions` | Get friend suggestions |
+| POST | `/friends/request/:userId` | Send friend request |
+| PUT | `/friends/accept/:requestId` | Accept friend request |
+| PUT | `/friends/reject/:requestId` | Reject friend request |
+| DELETE | `/friends/cancel/:requestId` | Cancel sent request |
+| DELETE | `/friends/:friendId` | Remove friend |
+
+### Stories
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/stories` | Get all stories (grouped by user) |
+| POST | `/stories` | Create a story |
+
+### Bookmarks
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/bookmarks` | Get bookmarked posts |
+| POST | `/bookmarks/:postId` | Toggle bookmark |
 
 ### Upload
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/upload` | Upload image to Cloudinary |
+| POST | `/upload/image` | Upload image to Cloudinary |
 
-## 🔒 Security Features
+---
 
-- **JWT Authentication** — Token-based auth with 7-day expiry
-- **Password Hashing** — bcryptjs with salt rounds
-- **Helmet** — Secure HTTP headers
-- **CORS** — Whitelist-based origin control
-- **Rate Limiting** — 100 req/15min (API), stricter for auth routes
-- **Input Validation** — Zod schemas on all endpoints
+## 🛠️ Tech Stack
+- **Runtime:** Node.js
+- **Framework:** Express.js
+- **Language:** TypeScript
+- **Database:** MongoDB Atlas (Mongoose ODM)
+- **Authentication:** JWT (jsonwebtoken) + bcrypt
+- **File Upload:** Cloudinary
+- **Validation:** Zod
+- **Security:** Helmet, CORS, express-rate-limit
+- **Deployment:** Vercel (Serverless)
 
-## 📐 Database Design Decisions
+---
 
-- **Separate Like Models** (`PostLike`, `CommentLike`) — Better query performance at scale vs embedded arrays
-- **Indexes** on `post`, `user`, `createdAt` fields — Efficient queries for millions of records
-- **Pagination** — Skip/limit based, prevents loading entire dataset
-- **Private/Public Posts** — `$or` query filter: public posts + user's own private posts
+## 🏗️ Project Structure
+```
+src/
+├── app/
+│   ├── modules/
+│   │   ├── user/           # User model, controller, service, routes
+│   │   ├── auth/           # Auth controller, service, routes
+│   │   ├── post/           # Post model, controller, service, routes
+│   │   ├── comment/        # Comment model, controller, service, routes
+│   │   ├── friend/         # FriendRequest model, controller, service, routes
+│   │   ├── story/          # Story model, controller, service, routes
+│   │   ├── bookmark/       # Bookmark model, controller, service, routes
+│   │   └── upload/         # Upload controller, service, routes
+│   └── middlewares/
+│       └── auth.middleware.ts
+├── app.ts                  # Express app setup
+└── server.ts               # Server entry point
+```
 
-## 🚀 Setup & Run
+---
+
+## 🗄️ Database Models
+
+- **User** — firstName, lastName, email, password (bcrypt hashed), avatar
+- **Post** — content, imageUrl, isPrivate, author (ref: User)
+- **PostLike** — post + user (compound unique index)
+- **Comment** — content, post, author, parentComment (self-referencing for replies)
+- **CommentLike** — comment + user (compound unique index)
+- **FriendRequest** — sender, receiver, status (pending/accepted/rejected)
+- **Story** — author, imageUrl, expiresAt (TTL index — auto-deletes after 24hrs)
+- **Bookmark** — user + post (compound unique index)
+
+---
+
+## 🔒 Security Measures
+- JWT tokens for session management
+- bcrypt for password hashing (12 salt rounds)
+- Helmet for HTTP security headers
+- CORS with whitelisted origins
+- Rate limiting (100 requests/15min general, 20/min for auth)
+- Zod schema validation on all inputs
+- Mongoose for MongoDB injection prevention
+
+---
+
+## 🚀 How to Run Locally
 
 ```bash
+# Clone the repository
+git clone https://github.com/sakkib443/social_server.git
+cd social_server
+
 # Install dependencies
 npm install
 
-# Development
-npm run start:dev
+# Create .env file with:
+# DATABASE_URL=mongodb+srv://...
+# JWT_SECRET=your_secret
+# CLOUDINARY_CLOUD_NAME=your_cloud
+# CLOUDINARY_API_KEY=your_key
+# CLOUDINARY_API_SECRET=your_secret
 
-# Build
-npm run build
-
-# Production
-npm run start:prod
+# Run development server
+npm run dev
 ```
 
-## 🌐 Environment Variables
+Server runs on http://localhost:5000
 
-```env
-DATABASE_URL=mongodb+srv://...
-JWT_SECRET=your-secret-key
-JWT_EXPIRES_IN=7d
-CLOUDINARY_CLOUD_NAME=your-cloud-name
-CLOUDINARY_API_KEY=your-api-key
-CLOUDINARY_API_SECRET=your-api-secret
-CLIENT_URL=https://your-client-url.vercel.app
-GOOGLE_CLIENT_ID=your-google-client-id
-NODE_ENV=production
-```
+---
 
-## 📦 Deployment
+## 📝 Design Decisions
 
-Deployed on **Vercel** as a serverless function.
+1. **Modular Architecture:** Each feature (User, Post, Comment, etc.) has its own module with separate model, controller, service, and routes files for clean separation of concerns.
 
-- **Live URL:** https://social-server-kappa-six.vercel.app
-- **Health Check:** https://social-server-kappa-six.vercel.app/health
+2. **Compound Indexes:** Used compound unique indexes on PostLike (post + user) and CommentLike (comment + user) to prevent duplicate likes and enable fast lookups.
+
+3. **TTL Index for Stories:** MongoDB TTL index on `expiresAt` field automatically deletes stories after 24 hours without any cron job.
+
+4. **Pagination:** All list endpoints support pagination with `page` and `limit` query params, designed to handle millions of records.
+
+5. **Lean Queries:** Used `.lean()` for read-only queries to skip Mongoose hydration and improve performance.
+
+---
+
+## 👤 Developer
+**Sheikh Sakibul Hasan**  
+🌐 https://www.extrainweb.com  
+💻 https://github.com/sakkib443
