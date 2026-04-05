@@ -9,6 +9,9 @@ import { AuthRoutes } from './app/modules/auth/auth.routes';
 import { PostRoutes } from './app/modules/post/post.routes';
 import { CommentRoutes } from './app/modules/comment/comment.routes';
 import { UploadRoutes } from './app/modules/upload/upload.routes';
+import { FriendRoutes } from './app/modules/friend/friend.routes';
+import { StoryRoutes } from './app/modules/story/story.routes';
+import { BookmarkRoutes } from './app/modules/bookmark/bookmark.routes';
 
 const app: Application = express();
 
@@ -90,6 +93,9 @@ app.use('/api/auth', AuthRoutes);
 app.use('/api/posts', PostRoutes);
 app.use('/api/posts/:postId/comments', CommentRoutes);
 app.use('/api/upload', UploadRoutes);
+app.use('/api/friends', FriendRoutes);
+app.use('/api/stories', StoryRoutes);
+app.use('/api/bookmarks', BookmarkRoutes);
 
 // ✅ 404 Handler
 app.use((req: Request, res: Response) => {
