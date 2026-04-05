@@ -8,10 +8,12 @@ router.use(authMiddleware);
 
 router.get('/', friendController.getFriends);
 router.get('/requests', friendController.getPendingRequests);
+router.get('/sent', friendController.getSentRequests);
 router.get('/suggestions', friendController.getSuggestions);
 router.post('/request/:userId', friendController.sendRequest);
 router.put('/accept/:requestId', friendController.acceptRequest);
 router.put('/reject/:requestId', friendController.rejectRequest);
+router.delete('/cancel/:requestId', friendController.cancelRequest);
 router.delete('/:friendId', friendController.removeFriend);
 
 export const FriendRoutes = router;

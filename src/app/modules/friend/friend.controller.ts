@@ -53,6 +53,30 @@ export const friendController = {
     }
   },
 
+  async getSentRequests(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as AuthRequest).user?.userId;
+      if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+      const requests = await friendService.getSentRequests(userId);
+      return res.status(200).json({ success: true, message: 'Sent requests', data: { requests } });
+    } catch (error: any) {
+      next(error);
+    }
+  },
+
+  async cancelRequest(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as AuthRequest).user?.userId;
+      if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+      const { requestId } = req.params as any;
+      await friendService.cancelRequest(requestId as string, userId);
+      return res.status(200).json({ success: true, message: 'Request cancelled' });
+    } catch (error: any) {
+      if (error.status) return res.status(error.status).json({ success: false, message: error.message });
+      next(error);
+    }
+  },
+
   async getFriends(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = (req as AuthRequest).user?.userId;

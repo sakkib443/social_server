@@ -65,6 +65,24 @@ export const friendService = {
       .lean();
   },
 
+  // Get sent requests (sent by me, still pending)
+  async getSentRequests(userId: string) {
+    return await FriendRequest.find({ sender: userId, status: 'pending' })
+      .populate('receiver', 'firstName lastName email avatar')
+      .sort({ createdAt: -1 })
+      .lean();
+  },
+
+  // Cancel my own sent request
+  async cancelRequest(requestId: string, userId: string) {
+    const request = await FriendRequest.findById(requestId);
+    if (!request) throw { status: 404, message: 'Request not found' };
+    if (request.sender.toString() !== userId) throw { status: 403, message: 'Not your request' };
+    if (request.status !== 'pending') throw { status: 400, message: 'Request not pending' };
+    await FriendRequest.findByIdAndDelete(requestId);
+    return { success: true };
+  },
+
   // Get my friends
   async getFriends(userId: string) {
     const friendships = await FriendRequest.find({
