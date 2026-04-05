@@ -16,7 +16,16 @@ export const postService = {
     // Populate author info
     await post.populate('author', 'firstName lastName email avatar');
 
-    return post;
+    // Return with _count and isLikedByMe to match expected Post shape
+    const postObj = post.toObject();
+    return {
+      ...postObj,
+      _count: {
+        likes: 0,
+        comments: 0,
+      },
+      isLikedByMe: false,
+    };
   },
 
   // Get all posts with pagination
