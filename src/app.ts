@@ -1,5 +1,5 @@
 import cors, { CorsOptions } from 'cors';
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 
@@ -80,8 +80,8 @@ app.use((req: Request, res: Response) => {
   });
 });
 
-// ✅ Global Error Handler
-app.use((err: Error, req: Request, res: Response) => {
+// ✅ Global Error Handler (must have 4 params for Express to recognize as error handler)
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   console.error('Error:', err);
   res.status(500).json({
     success: false,

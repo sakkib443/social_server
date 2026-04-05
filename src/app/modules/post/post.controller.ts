@@ -5,8 +5,9 @@ import { AuthRequest } from '../../middlewares/auth.middleware';
 import { ZodError } from 'zod';
 
 const formatZodError = (error: ZodError) => {
-  return error.errors.map((err) => ({
-    field: err.path.join('.'),
+  const issues = error.issues || [];
+  return issues.map((err: any) => ({
+    field: err.path?.join('.') || '',
     message: err.message,
   }));
 };
@@ -78,7 +79,7 @@ export const postController = {
   async getPostById(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = (req as AuthRequest).user?.userId || null;
-      const { id } = req.params;
+      const id = req.params.id as string;
 
       const post = await postService.getPostById(id, userId);
 
@@ -103,7 +104,7 @@ export const postController = {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
       }
 
-      const { id } = req.params;
+      const id = req.params.id as string;
       await postService.deletePost(id, userId);
 
       return res.status(200).json({
@@ -126,7 +127,7 @@ export const postController = {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
       }
 
-      const { id } = req.params;
+      const id = req.params.id as string;
       const result = await postService.toggleLike(id, userId);
 
       return res.status(200).json({
@@ -145,7 +146,7 @@ export const postController = {
   // GET /api/posts/:id/likers - Get who liked
   async getLikers(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
 

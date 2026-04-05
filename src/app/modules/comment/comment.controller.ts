@@ -5,8 +5,9 @@ import { AuthRequest } from '../../middlewares/auth.middleware';
 import { ZodError } from 'zod';
 
 const formatZodError = (error: ZodError) => {
-  return error.errors.map((err) => ({
-    field: err.path.join('.'),
+  const issues = error.issues || [];
+  return issues.map((err: any) => ({
+    field: err.path?.join('.') || '',
     message: err.message,
   }));
 };
@@ -20,7 +21,7 @@ export const commentController = {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
       }
 
-      const { postId } = req.params;
+      const postId = req.params.postId as string;
 
       const validationResult = createCommentSchema.safeParse({ body: req.body });
       if (!validationResult.success) {
@@ -58,7 +59,8 @@ export const commentController = {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
       }
 
-      const { postId, commentId } = req.params;
+      const postId = req.params.postId as string;
+      const commentId = req.params.commentId as string;
 
       const validationResult = createReplySchema.safeParse({ body: req.body });
       if (!validationResult.success) {
@@ -93,7 +95,7 @@ export const commentController = {
   async getComments(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = (req as AuthRequest).user?.userId || null;
-      const { postId } = req.params;
+      const postId = req.params.postId as string;
 
       const comments = await commentService.getPostComments(postId, userId);
 
@@ -114,7 +116,7 @@ export const commentController = {
   async getReplies(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = (req as AuthRequest).user?.userId || null;
-      const { commentId } = req.params;
+      const commentId = req.params.commentId as string;
 
       const replies = await commentService.getCommentReplies(commentId, userId);
 
@@ -139,7 +141,7 @@ export const commentController = {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
       }
 
-      const { commentId } = req.params;
+      const commentId = req.params.commentId as string;
       await commentService.deleteComment(commentId, userId);
 
       return res.status(200).json({
@@ -162,7 +164,7 @@ export const commentController = {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
       }
 
-      const { commentId } = req.params;
+      const commentId = req.params.commentId as string;
       const result = await commentService.toggleLike(commentId, userId);
 
       return res.status(200).json({
@@ -181,7 +183,7 @@ export const commentController = {
   // GET /api/posts/:postId/comments/:commentId/likers - Get who liked
   async getLikers(req: Request, res: Response, next: NextFunction) {
     try {
-      const { commentId } = req.params;
+      const commentId = req.params.commentId as string;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
 

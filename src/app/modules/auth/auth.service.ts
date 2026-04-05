@@ -103,7 +103,7 @@ export const authService = {
     return jwt.sign(
       { userId },
       config.jwt.secret,
-      { expiresIn: config.jwt.expires_in }
+      { expiresIn: config.jwt.expires_in as any }
     );
   },
 
